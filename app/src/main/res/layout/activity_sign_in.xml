@@ -6,7 +6,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SignInActivity">
+    tools:context=".ui.SignInActivity">
 
     <!-- Optional Welcome Text -->
     <TextView
@@ -22,7 +22,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="48dp"/>
 
-    <!-- ProgressBar (shows while signing in) -->
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
@@ -35,7 +34,6 @@
         android:layout_marginTop="24dp"
         android:layout_marginBottom="24dp"/>
 
-    <!-- Google Sign In Button -->
     <com.google.android.gms.common.SignInButton
         android:id="@+id/signInButton"
         android:layout_width="0dp"

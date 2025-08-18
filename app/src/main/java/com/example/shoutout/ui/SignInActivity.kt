@@ -1,18 +1,19 @@
-package com.example.shoutout
+package com.example.shoutout.ui
 
 import android.content.ContentValues.TAG
 import android.content.Intent
-import androidx.credentials.GetCredentialRequest
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.Button
 import android.widget.ProgressBar
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.lifecycleScope
+import com.example.shoutout.R
+import com.example.shoutout.models.User
+import com.example.shoutout.viewmodels.UserViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -20,17 +21,12 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.SignInButton
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
-import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.auth
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 
 class SignInActivity : AppCompatActivity() {
 
@@ -39,6 +35,9 @@ class SignInActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var signInButton: SignInButton
     private lateinit var progressBar: ProgressBar
+
+    // ✅ use UserViewModel
+    private val userViewModel: UserViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,11 +48,11 @@ class SignInActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        signInButton = findViewById<SignInButton>(R.id.signInButton)
-        progressBar = findViewById<ProgressBar>(R.id.progressBar)
+        signInButton = findViewById(R.id.signInButton)
+        progressBar = findViewById(R.id.progressBar)
         signInButton.setSize(SignInButton.SIZE_WIDE)
         signInButton.setColorScheme(SignInButton.COLOR_DARK)
-        // Instantiate a Google sign-in request
+
         val googleSignInOption = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(getString(R.string.default_web_client_id))
             .requestEmail().build()
@@ -61,10 +60,12 @@ class SignInActivity : AppCompatActivity() {
         googleSignInClient = GoogleSignIn.getClient(this, googleSignInOption)
         auth = Firebase.auth
 
-        signInButton.setOnClickListener {
-            signIn()
-        }
+        signInButton.setOnClickListener { signIn() }
+    }
 
+    override fun onStart() {
+        super.onStart()
+        updateUI(auth.currentUser)
     }
 
     private fun signIn() {
@@ -74,7 +75,6 @@ class SignInActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
         if (requestCode == RC_SIGN_IN) {
             val task = GoogleSignIn.getSignedInAccountFromIntent(data)
             handleSignInResult(task)
@@ -83,13 +83,11 @@ class SignInActivity : AppCompatActivity() {
 
     private fun handleSignInResult(completedTask: Task<GoogleSignInAccount>) {
         try {
-            val account =
-                completedTask.getResult(ApiException::class.java)!!
+            val account = completedTask.getResult(ApiException::class.java)!!
             Log.d(TAG, "firebaseAuthWithGoogle:" + account.id)
             firebaseAuthWithGoogle(account.idToken!!)
         } catch (e: ApiException) {
             Log.w(TAG, "signInResult:failed code=" + e.statusCode)
-
         }
     }
 
@@ -98,28 +96,26 @@ class SignInActivity : AppCompatActivity() {
         signInButton.visibility = View.GONE
         progressBar.visibility = View.VISIBLE
 
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val result = auth.signInWithCredential(credential).await()
-                val firebaseUser = result.user
-                withContext(Dispatchers.Main) {
-                    updateUI(firebaseUser)
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "Firebase sign-in failed: ${e.message}")
-                withContext(Dispatchers.Main) {
-                    signInButton.visibility = View.VISIBLE
-                    progressBar.visibility = View.GONE
-                }
+        auth.signInWithCredential(credential).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                updateUI(auth.currentUser)
+            } else {
+                Log.e(TAG, "Firebase sign-in failed: ${task.exception?.message}")
+                signInButton.visibility = View.VISIBLE
+                progressBar.visibility = View.GONE
             }
         }
     }
 
     private fun updateUI(firebaseUser: FirebaseUser?) {
         if (firebaseUser != null) {
-
-            val mainActivityIntent = Intent(this, MainActivity::class.java)
-            startActivity(mainActivityIntent)
+            val user = User(
+                firebaseUser.uid,
+                firebaseUser.displayName ?: "",
+                firebaseUser.photoUrl.toString()
+            )
+            userViewModel.addUser(user) // ✅ call through ViewModel
+            startActivity(Intent(this, MainActivity::class.java))
             finish()
         } else {
             signInButton.visibility = View.VISIBLE
