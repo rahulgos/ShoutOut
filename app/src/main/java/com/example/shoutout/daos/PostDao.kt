@@ -1,63 +1,55 @@
 package com.example.shoutout.daos
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.example.shoutout.models.Post
 import com.example.shoutout.models.User
-import com.google.firebase.auth.ktx.auth
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
-import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.tasks.await
 
 class PostDao {
 
     private val db = FirebaseFirestore.getInstance()
-    private val postCollections = db.collection("posts")
-    private val auth = Firebase.auth
-    private var postsListener: ListenerRegistration? = null
+    private val postCollection = db.collection("posts")
 
-    /** Add new post */
-    suspend fun addPost(text: String, currentUserId: String) {
-        val userDao = UserDao()
-        val snapshot = userDao.getUserById(currentUserId)
-        val user = snapshot.toObject(User::class.java) ?: return
-        val currentTime = System.currentTimeMillis()
-        val postId = postCollections.document().id
-        val post = Post(postId = postId, text = text, createdBy = user, createdAt = currentTime)
-        postCollections.document(postId).set(post).await()
+    // Returns Firestore Query for real-time listener
+    fun getAllPostsQuery(): Query = postCollection.orderBy("createdAt", Query.Direction.DESCENDING)
+
+    // Add new post
+    fun addPost(text: String) {
+        val currentUser = FirebaseAuth.getInstance().currentUser ?: return
+        val post = Post(
+            text = text,
+            createdBy = User(
+                uid = currentUser.uid,
+                displayName = currentUser.displayName ?: "",
+                imageUrl = currentUser.photoUrl?.toString() ?: ""
+            ),
+            createdAt = System.currentTimeMillis()
+        )
+        postCollection.add(post)
     }
 
-    /** Live updates for posts */
-    fun listenToPosts(): LiveData<List<Post>> {
-        val liveData = MutableLiveData<List<Post>>()
-        postsListener?.remove() // avoid duplicate listeners
+    // Update existing post text
+    fun updatePost(postId: String, newText: String) {
+        postCollection.document(postId).update("text", newText)
+    }
 
-        postsListener = postCollections
-            .orderBy("createdAt", Query.Direction.DESCENDING)
-            .addSnapshotListener { snapshot, e ->
-                if (e != null || snapshot == null) {
-                    liveData.postValue(emptyList())
-                    return@addSnapshotListener
-                }
-                val posts = snapshot.toObjects(Post::class.java)
-                liveData.postValue(posts)
+    // Delete post
+    fun deletePost(postId: String) {
+        postCollection.document(postId).delete()
+    }
+
+    // Update likes
+    fun updateLikes(postId: String, currentUserId: String) {
+        val postRef = postCollection.document(postId)
+        db.runTransaction { transaction ->
+            val snapshot = transaction.get(postRef)
+            val post = snapshot.toObject(Post::class.java) ?: return@runTransaction
+            if (post.likedBy.contains(currentUserId)) {
+                transaction.update(postRef, "likedBy", post.likedBy - currentUserId)
+            } else {
+                transaction.update(postRef, "likedBy", post.likedBy + currentUserId)
             }
-
-        return liveData
-    }
-
-    /** Update Likes for a post */
-    suspend fun updateLikes(postId: String) {
-        val currentUserId = auth.currentUser?.uid ?: return
-        val post = postCollections.document(postId).get().await().toObject(Post::class.java) ?: return
-
-        if (post.likedBy.contains(currentUserId)) {
-            post.likedBy.remove(currentUserId)
-        } else {
-            post.likedBy.add(currentUserId)
         }
-        postCollections.document(postId).set(post).await()
     }
 }

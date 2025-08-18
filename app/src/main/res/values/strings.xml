@@ -2,4 +2,8 @@
     <string name="app_name">ShoutOut</string>
     <string name="default_web_client_id">886902689896-55um91msmrbpf5n7sepld1be2h46oqrf.apps.googleusercontent.com</string>
     <string name="welcome_to_shoutout">Welcome to ShoutOut!</string>
+    <string name="user_image">User Image</string>
+    <string name="like_post">Like Post</string>
+    <string name="edit_post">Edit Post</string>
+    <string name="delete_post">Delete Post</string>
 </resources>

@@ -12,9 +12,6 @@ import com.example.shoutout.Utils
 import com.example.shoutout.models.Post
 import com.google.firebase.auth.FirebaseAuth
 
-/**
- * RecyclerView Adapter to bind Post data to item_post layout.
- */
 class PostAdapter(
     private var postList: List<Post>,
     private val listener: IPostAdapter
@@ -22,6 +19,8 @@ class PostAdapter(
 
     interface IPostAdapter {
         fun onLikeClicked(postId: String)
+        fun onEditClicked(post: Post)
+        fun onDeleteClicked(post: Post)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
@@ -34,26 +33,39 @@ class PostAdapter(
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
         val post = postList[position]
-        val userId = FirebaseAuth.getInstance().currentUser?.uid
 
+        // Text bindings
         holder.postText.text = post.text
         holder.userText.text = post.createdBy.displayName
         holder.createdAt.text = Utils.getTimeAgo(post.createdAt)
         holder.likeCount.text = post.likedBy.size.toString()
 
+        // Load profile image
         Glide.with(holder.userImage.context)
             .load(post.createdBy.imageUrl)
+            .placeholder(R.drawable.ic_person)
+            .error(R.drawable.ic_person)
             .circleCrop()
             .into(holder.userImage)
 
+        // Like state
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
         holder.likeButton.setImageResource(
             if (userId != null && post.likedBy.contains(userId))
-                R.drawable.liked else R.drawable.unliked
+                R.drawable.liked
+            else
+                R.drawable.unliked
         )
 
-        holder.likeButton.setOnClickListener {
-            listener.onLikeClicked(post.postId)
-        }
+        holder.likeButton.setOnClickListener { listener.onLikeClicked(post.postId) }
+
+        // Owner-only visibility for Edit/Delete
+        val isOwner = post.createdBy.uid == userId
+        holder.editButton.visibility = if (isOwner) View.VISIBLE else View.GONE
+        holder.deleteButton.visibility = if (isOwner) View.VISIBLE else View.GONE
+
+        holder.editButton.setOnClickListener { listener.onEditClicked(post) }
+        holder.deleteButton.setOnClickListener { listener.onDeleteClicked(post) }
     }
 
     fun updateData(newList: List<Post>) {
@@ -61,7 +73,7 @@ class PostAdapter(
         notifyDataSetChanged()
     }
 
-    fun getPosts() = postList
+    fun getPosts(): List<Post> = postList
 
     class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val postText: TextView = itemView.findViewById(R.id.postTitle)
@@ -70,6 +82,7 @@ class PostAdapter(
         val likeCount: TextView = itemView.findViewById(R.id.likeCount)
         val userImage: ImageView = itemView.findViewById(R.id.userImage)
         val likeButton: ImageView = itemView.findViewById(R.id.likeButton)
+        val editButton: ImageView = itemView.findViewById(R.id.editButton)
+        val deleteButton: ImageView = itemView.findViewById(R.id.deleteButton)
     }
 }
-
