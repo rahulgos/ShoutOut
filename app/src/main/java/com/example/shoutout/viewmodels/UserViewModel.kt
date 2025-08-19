@@ -13,19 +13,15 @@ class UserViewModel(
     private val userDao: UserDao = UserDao()
 ) : ViewModel() {
 
-    /** Add User */
-    fun addUser(user: User) {
-        viewModelScope.launch {
-            userDao.addUser(user)
-        }
+    /** Add a new user to Firestore */
+    fun addUser(user: User) = viewModelScope.launch {
+        userDao.addUser(user)
     }
 
-    /** Get User by Id (returns via callback to UI) */
-    fun getUserById(uId: String, onResult: (User?) -> Unit) {
-        viewModelScope.launch {
-            val snapshot = userDao.getUserById(uId)
-            val user = snapshot.toObject(User::class.java)
-            onResult(user)
-        }
+    /** Get a user by UID and return via callback */
+    fun getUserById(uId: String, onResult: (User?) -> Unit) = viewModelScope.launch {
+        val snapshot = userDao.getUserById(uId)
+        val user = snapshot.toObject(User::class.java)
+        onResult(user)
     }
 }

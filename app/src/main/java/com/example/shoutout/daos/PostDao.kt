@@ -11,10 +11,10 @@ class PostDao {
     private val db = FirebaseFirestore.getInstance()
     private val postCollection = db.collection("posts")
 
-    // Returns Firestore Query for real-time listener
+    // Returns query for real-time posts listener
     fun getAllPostsQuery(): Query = postCollection.orderBy("createdAt", Query.Direction.DESCENDING)
 
-    // Add new post
+    // Add a new post
     fun addPost(text: String) {
         val currentUser = FirebaseAuth.getInstance().currentUser ?: return
         val post = Post(
@@ -29,7 +29,7 @@ class PostDao {
         postCollection.add(post)
     }
 
-    // Update existing post text
+    // Update post text
     fun updatePost(postId: String, newText: String) {
         postCollection.document(postId).update("text", newText)
     }
@@ -39,17 +39,18 @@ class PostDao {
         postCollection.document(postId).delete()
     }
 
-    // Update likes
+    // Toggle like for current user
     fun updateLikes(postId: String, currentUserId: String) {
         val postRef = postCollection.document(postId)
         db.runTransaction { transaction ->
             val snapshot = transaction.get(postRef)
             val post = snapshot.toObject(Post::class.java) ?: return@runTransaction
-            if (post.likedBy.contains(currentUserId)) {
-                transaction.update(postRef, "likedBy", post.likedBy - currentUserId)
+            val updatedLikes = if (post.likedBy.contains(currentUserId)) {
+                post.likedBy - currentUserId
             } else {
-                transaction.update(postRef, "likedBy", post.likedBy + currentUserId)
+                post.likedBy + currentUserId
             }
+            transaction.update(postRef, "likedBy", updatedLikes)
         }
     }
 }

@@ -6,31 +6,54 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/white"
     tools:context=".ui.CreatePostActivity">
 
+    <!-- Toolbar -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:title="ShoutOut"
+        app:titleTextColor="@android:color/white"
+        app:elevation="4dp"
+        tools:ignore="MissingConstraints" />
+
+    <!-- Post input -->
     <EditText
         android:id="@+id/postInput"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:hint="Please share your post"
+        android:hint="@string/please_share_your_post"
         android:gravity="top|start"
-        android:layout_margin="12dp"
-        android:padding="12dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:padding="16dp"
         android:background="@drawable/edittext_shape"
-        app:layout_constraintTop_toTopOf="parent"
+        android:textColor="@android:color/black"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
         app:layout_constraintBottom_toTopOf="@id/postButton"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- Post button -->
     <Button
         android:id="@+id/postButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="POST"
+        android:text="@string/post"
         android:background="@drawable/edittext_shape"
-        android:layout_margin="12dp"
+        android:textColor="@android:color/white"
+        android:textAllCaps="false"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

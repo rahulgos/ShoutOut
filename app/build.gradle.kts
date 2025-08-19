@@ -44,9 +44,9 @@ android {
 
 dependencies {
     // Firebase
-    implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
-    implementation("com.google.firebase:firebase-auth-ktx")
-    implementation("com.google.firebase:firebase-firestore-ktx")
+    implementation(libs.firebase.bom)
+    implementation(libs.firebase.auth.ktx)
+    implementation(libs.firebase.firestore.ktx)
     implementation(libs.firebase.ui.firestore)
     implementation(libs.play.services.auth)
 
@@ -62,17 +62,17 @@ dependencies {
 
     // Glide (image loading)
     implementation(libs.glide)
-    kapt(libs.compiler) // ✅ if this is Glide’s compiler
+    kapt(libs.compiler)
 
     // Lifecycle (ViewModel + LiveData + Lifecycle runtime)
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.7")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
-    implementation("androidx.lifecycle:lifecycle-common-java8:2.8.7")
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.livedata.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.common.java8)
 
     // Activity & Fragment KTX (needed for by viewModels())
-    implementation("androidx.activity:activity-ktx:1.9.2")
-    implementation("androidx.fragment:fragment-ktx:1.8.2")
+    implementation(libs.androidx.activity.ktx)
+    implementation(libs.androidx.fragment.ktx)
 
     // Google Identity
     implementation(libs.googleid)

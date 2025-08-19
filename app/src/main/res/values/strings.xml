@@ -6,4 +6,11 @@
     <string name="like_post">Like Post</string>
     <string name="edit_post">Edit Post</string>
     <string name="delete_post">Delete Post</string>
+    <string name="please_share_your_post">Please share your post</string>
+    <string name="post">POST</string>
+    <string name="user_name">User Name</string>
+    <string name="_2h_ago">2h ago</string>
+    <string name="sample_post_text_here">Sample post text here</string>
+    <string name="_0">0</string>
+    <string name="logout">Logout</string>
 </resources>

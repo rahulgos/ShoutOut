@@ -34,7 +34,7 @@ class PostAdapter(
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
         val post = postList[position]
 
-        // Text bindings
+        // Bind text views
         holder.postText.text = post.text
         holder.userText.text = post.createdBy.displayName
         holder.createdAt.text = Utils.getTimeAgo(post.createdAt)
@@ -48,15 +48,11 @@ class PostAdapter(
             .circleCrop()
             .into(holder.userImage)
 
-        // Like state
+        // Like button state
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         holder.likeButton.setImageResource(
-            if (userId != null && post.likedBy.contains(userId))
-                R.drawable.liked
-            else
-                R.drawable.unliked
+            if (userId != null && post.likedBy.contains(userId)) R.drawable.liked else R.drawable.unliked
         )
-
         holder.likeButton.setOnClickListener { listener.onLikeClicked(post.postId) }
 
         // Owner-only visibility for Edit/Delete

@@ -1,7 +1,7 @@
 package com.example.shoutout.models
 
 /**
- * User Model - represents an app user in Firestore.
+ * Represents a user in Firestore.
  */
 data class User(
     val uid: String = "",

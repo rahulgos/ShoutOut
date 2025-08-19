@@ -1,8 +1,8 @@
 package com.example.shoutout.daos
 
 import com.example.shoutout.models.User
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
 class UserDao {
@@ -12,9 +12,7 @@ class UserDao {
 
     // Add a new user to Firestore
     suspend fun addUser(user: User) {
-        user.uid.let { uid ->
-            usersCollection.document(uid).set(user).await()
-        }
+        usersCollection.document(user.uid).set(user).await()
     }
 
     // Get user details by userId

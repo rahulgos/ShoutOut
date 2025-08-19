@@ -1,5 +1,8 @@
 package com.example.shoutout
 
+/**
+ * Utility functions for time formatting and other helpers.
+ */
 class Utils {
     companion object {
         private const val SECOND_MILLIS = 1000
@@ -7,6 +10,9 @@ class Utils {
         private const val HOUR_MILLIS = 60 * MINUTE_MILLIS
         private const val DAY_MILLIS = 24 * HOUR_MILLIS
 
+        /**
+         * Returns a human-readable string for the time elapsed since [time].
+         */
         fun getTimeAgo(time: Long): String? {
             val now = System.currentTimeMillis()
             if (time > now || time <= 0) return null

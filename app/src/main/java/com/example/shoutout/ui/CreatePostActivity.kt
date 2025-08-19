@@ -26,6 +26,7 @@ class CreatePostActivity : AppCompatActivity() {
         postId = intent.getStringExtra("postId")
         val postText = intent.getStringExtra("postText")
 
+        // If editing existing post
         if (postId != null) {
             postInput.setText(postText)
             postButton.text = "Update Post"
