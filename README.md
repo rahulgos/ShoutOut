@@ -75,5 +75,3 @@ com.example.shoutout
 
 4. Build and run the app on an emulator or physical device.
 
-## Project Structure
-
