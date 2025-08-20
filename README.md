@@ -1,6 +1,6 @@
 # ShoutOut App
 
-ShoutOut is an Android social media app that allows users to create, like, edit, and delete posts in real-time using **Firebase Firestore** and **Firebase Authentication**. The app demonstrates **MVVM architecture**, **Kotlin Coroutines**, **RecyclerView**, and clean Android development practices suitable for a 2-year experienced Android developer.
+ShoutOut is an Android social media app that allows users to create, like, edit, and delete posts in real-time using **Firebase Firestore** and **Firebase Authentication**. The app demonstrates **MVVM architecture**, **Kotlin Coroutines**, **RecyclerView**, and clean Android development practices.
 
 ---
 
@@ -10,7 +10,7 @@ ShoutOut is an Android social media app that allows users to create, like, edit,
   Users can sign in with their Google account. User info is stored in Firestore.
 
 - **Create, Edit, Delete Posts**  
-  Authenticated users can create new posts, edit their own posts, or delete them.
+  Authenticated users can create new posts, edit their posts, or delete them.
 
 - **Like Posts**  
   Users can like/unlike posts. Likes are updated in real-time.
@@ -28,7 +28,7 @@ ShoutOut is an Android social media app that allows users to create, like, edit,
 
 ## Tech Stack
 
-- **Language:** Kotlin  
+- **Language:** Kotlin, XML
 - **Architecture:** MVVM  
 - **Firebase:** Authentication, Firestore Realtime Database  
 - **UI:** RecyclerView, MaterialToolbar, FloatingActionButton  
@@ -66,12 +66,10 @@ com.example.shoutout
 
 1. Clone the repository:  
    ```bash
-   git clone https://github.com/yourusername/ShoutOut.git
-
+   git clone https://github.com/rahulgos/ShoutOut.git
    ```
 2. Open in Android Studio and sync Gradle.
 
 3. Add your Firebase project and google-services.json in app/ folder.
 
 4. Build and run the app on an emulator or physical device.
-
